@@ -64,6 +64,12 @@ userSchema.static(
   }
 );
 
+//pre hooks
+userSchema.pre("save", (next) => {
+  this.password = "qyuweyquwieyiquywuei";
+  next();
+});
+
 const User = database.model<IUser, UserModel>("User", userSchema);
 
 export default User;
