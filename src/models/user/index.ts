@@ -1,5 +1,6 @@
 import { Model } from "mongoose";
 import database from "../../database";
+import bcrypt from "bcrypt";
 
 export interface IUser {
   username: string;
@@ -65,9 +66,15 @@ userSchema.static(
 );
 
 //pre hooks
-userSchema.pre("save", (next) => {
-  this.password = "qyuweyquwieyiquywuei";
-  next();
+userSchema.pre("save", async function (next) {
+  const user = this;
+  try {
+    const hashedPassword = await bcrypt.hash(user.password, 10);
+    user.password = hashedPassword;
+    next();
+  } catch (error) {
+    throw new Error("Error hashing password");
+  }
 });
 
 const User = database.model<IUser, UserModel>("User", userSchema);
