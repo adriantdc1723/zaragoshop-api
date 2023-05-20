@@ -1,6 +1,5 @@
 import User from "../models/user";
 import CreateUserDto from "../models/user/dto/CreateUserDto";
-import LoginUserDto from "../models/user/dto/LoginUserDto";
 
 export const createUser = async (createUserDto: CreateUserDto) => {
   const user = new User(createUserDto);

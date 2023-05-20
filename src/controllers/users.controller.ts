@@ -10,7 +10,6 @@ import {
   USER_CREATED_SUCCESSFULLY,
   USER_LOGIN_SUCCESS,
 } from "../constants/response-message";
-import LoginUserDto from "../models/user/dto/LoginUserDto";
 import jwt from "jsonwebtoken";
 
 export const createUser: RequestHandler = async (req, res) => {
