@@ -1,4 +1,4 @@
-import { Model } from "mongoose";
+import { HydratedDocument, Model } from "mongoose";
 import database from "../../database";
 import bcrypt from "bcrypt";
 
@@ -14,6 +14,10 @@ export interface IUser {
 export interface UserModel extends Model<IUser> {
   isEmailAddressExist: (emailAddress: string) => Promise<boolean>;
   isUsernameExist: (username: string) => Promise<boolean>;
+  verifyUser: (
+    username: string,
+    password: string
+  ) => Promise<HydratedDocument<IUser> | null>;
 }
 
 export const userSchema = new database.Schema<IUser, UserModel>(
@@ -66,6 +70,25 @@ userSchema.static(
       return true;
     }
     return false;
+  }
+);
+
+userSchema.static(
+  "verifyUser",
+  async function verifyUser(username: string = "", password: string = "") {
+    try {
+      const user = await User.findOne({ username });
+      if (user) {
+        const isPasswordMatched = await bcrypt.compare(password, user.password);
+        if (!isPasswordMatched) {
+          return null;
+        }
+        return user;
+      }
+      return null;
+    } catch (error: any) {
+      throw error;
+    }
   }
 );
 

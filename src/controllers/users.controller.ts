@@ -6,8 +6,12 @@ import CreateUserDto from "../models/user/dto/CreateUserDto";
 import {
   EMAIL_ADDRESS_ALREADY_USE,
   USERNAME_ALREADY_USE,
+  USERNAME_PASSWORD_NOT_MATCH,
   USER_CREATED_SUCCESSFULLY,
+  USER_LOGIN_SUCCESS,
 } from "../constants/response-message";
+import LoginUserDto from "../models/user/dto/LoginUserDto";
+import jwt from "jsonwebtoken";
 
 export const createUser: RequestHandler = async (req, res) => {
   const dto = req.body as CreateUserDto;
@@ -28,6 +32,28 @@ export const createUser: RequestHandler = async (req, res) => {
     return res
       .status(status.CREATED)
       .json(good(status.CREATED, data, USER_CREATED_SUCCESSFULLY));
+  } catch (error) {
+    return res
+      .status(status.INTERNAL_SERVER_ERROR)
+      .json(
+        bad(status.INTERNAL_SERVER_ERROR, status[status.INTERNAL_SERVER_ERROR])
+      );
+  }
+};
+
+export const loginUser: RequestHandler = async (req, res) => {
+  const dto = req.body as LoginUserDto;
+  try {
+    const user = await usersService.verifyUser(dto);
+    if (!user) {
+      return res
+        .status(status.BAD_REQUEST)
+        .json(bad(status.BAD_REQUEST, USERNAME_PASSWORD_NOT_MATCH));
+    }
+    const token = jwt.sign(user, process.env.JWT_SECRET || "secret");
+    return res
+      .status(status.OK)
+      .json(good(status.OK, { accessToken: token }, USER_LOGIN_SUCCESS));
   } catch (error) {
     return res
       .status(status.INTERNAL_SERVER_ERROR)

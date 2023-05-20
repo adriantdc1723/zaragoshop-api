@@ -1,5 +1,6 @@
 import User from "../models/user";
 import CreateUserDto from "../models/user/dto/CreateUserDto";
+import LoginUserDto from "../models/user/dto/LoginUserDto";
 
 export const createUser = async (createUserDto: CreateUserDto) => {
   const user = new User(createUserDto);
@@ -13,4 +14,11 @@ export const isEmailAddressExist = async (emailAddress: string = "") => {
 
 export const isUsernameExist = async (username: string = "") => {
   return await User.isEmailAddressExist(username);
+};
+
+export const verifyUser = async ({
+  username = "",
+  password = "",
+}: LoginUserDto) => {
+  return await User.verifyUser(username, password);
 };
