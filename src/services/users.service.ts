@@ -16,9 +16,9 @@ export const isUsernameExist = async (username: string = "") => {
   return await User.isEmailAddressExist(username);
 };
 
-export const verifyUser = async ({
-  username = "",
-  password = "",
-}: LoginUserDto) => {
+export const verifyUser = async (
+  username: string = "",
+  password: string = ""
+) => {
   return await User.verifyUser(username, password);
 };

@@ -42,9 +42,9 @@ export const createUser: RequestHandler = async (req, res) => {
 };
 
 export const loginUser: RequestHandler = async (req, res) => {
-  const dto = req.body as LoginUserDto;
+  const dto = req.body;
   try {
-    const user = await usersService.verifyUser(dto);
+    const user = await usersService.verifyUser(dto.username, dto.password);
     if (!user) {
       return res
         .status(status.BAD_REQUEST)
