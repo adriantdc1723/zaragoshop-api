@@ -2,10 +2,13 @@ import { Model } from "mongoose";
 import database from "../../database";
 import bcrypt from "bcrypt";
 
+export type TUserAccountType = "native" | "sso";
+
 export interface IUser {
   username: string;
   emailAddress: string;
   password: string;
+  accountType: TUserAccountType;
 }
 
 export interface UserModel extends Model<IUser> {
@@ -18,6 +21,7 @@ export const userSchema = new database.Schema<IUser, UserModel>(
     username: { type: String, required: true, unique: true },
     emailAddress: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    accountType: { type: String, default: "native" },
   },
   {
     timestamps: true,
