@@ -1,6 +1,13 @@
-import { HydratedDocument, Model } from "mongoose";
+import {
+  HydratedDocument,
+  Model,
+  ToObjectOptions,
+  Types,
+  Schema,
+} from "mongoose";
 import database from "../../database";
 import bcrypt from "bcrypt";
+import { userInformationSchema } from "../userInformation";
 
 export type TUserAccountType = "native" | "sso";
 
@@ -9,9 +16,14 @@ export interface IUser {
   emailAddress: string;
   password: string;
   accountType: TUserAccountType;
+  userInformation: Types.ObjectId;
 }
 
 export interface UserModel extends Model<IUser> {
+  updateUserPasswordById: (
+    id: string,
+    update: Partial<IUser> & Pick<IUser, "password">
+  ) => Promise<HydratedDocument<IUser> | null>;
   isEmailAddressExist: (emailAddress: string) => Promise<boolean>;
   isUsernameExist: (username: string) => Promise<boolean>;
   verifyUser: (
@@ -26,10 +38,21 @@ export const userSchema = new database.Schema<IUser, UserModel>(
     emailAddress: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     accountType: { type: String, default: "native" },
+    userInformation: { type: Schema.Types.ObjectId, ref: "UserInformation" },
   },
   {
     timestamps: true,
     toJSON: {
+      transform(doc, ret, options) {
+        delete ret.createdAt;
+        delete ret.updatedAt;
+        delete ret.password;
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.__v;
+      },
+    },
+    toObject: {
       transform(doc, ret, options) {
         delete ret.createdAt;
         delete ret.updatedAt;
@@ -45,7 +68,9 @@ export const userSchema = new database.Schema<IUser, UserModel>(
 //statics
 userSchema.static(
   "isEmailAddressExist",
-  async function isEmailAddressExist(emailAddress: string = "") {
+  async function isEmailAddressExist(
+    emailAddress: string = ""
+  ): Promise<boolean> {
     if (!emailAddress) {
       throw new Error("No Email address provided");
     }
@@ -60,7 +85,7 @@ userSchema.static(
 
 userSchema.static(
   "isUsernameExist",
-  async function isUsernameExist(username: string = "") {
+  async function isUsernameExist(username: string = ""): Promise<boolean> {
     if (!username) {
       throw new Error("No Username provided");
     }
@@ -88,6 +113,24 @@ userSchema.static(
       return null;
     } catch (error: any) {
       throw error;
+    }
+  }
+);
+
+userSchema.static(
+  "updateUserPasswordById",
+  async function updateUserPasswordById(
+    id: string,
+    update: Partial<IUser> & Pick<IUser, "password">
+  ) {
+    const { password } = update;
+    try {
+      const updatedHashedPassword = await bcrypt.hash(password, 10);
+      return await this.findByIdAndUpdate(id, {
+        password: updatedHashedPassword,
+      });
+    } catch (error) {
+      throw new Error("Cannot update password");
     }
   }
 );

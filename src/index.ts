@@ -13,7 +13,7 @@ const uri = `mongodb+srv://${dbUsername}:${dbPassword}@${dbHost}/${dbName}?retry
 
 const bootstrap = async (): Promise<void> => {
   try {
-    await database.connect(uri);
+    await database.connect("mongodb://127.0.0.1:27017");
     app
       .listen(port, () => console.log("[server]: Listening at port", port))
       .on("error", (error) => console.log("[server]: Error:", error.message));

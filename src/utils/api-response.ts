@@ -1,6 +1,6 @@
 export const good = (
   statusCode: number,
-  data: Record<any, any>,
+  data: Record<any, any> | null,
   message: string
 ) => ({ statusCode, data, message });
 
