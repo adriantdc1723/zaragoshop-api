@@ -14,6 +14,7 @@ const app: Express = express();
 app.use(json());
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.static("public"));
 app.use(requestLogger);
 app.all(requireTokenPaths, requireToken);
 
@@ -24,6 +25,6 @@ app.get("/api", ({}, res) =>
 
 app.use("/api", ROUTES);
 
-app.use("/", ({}, res) => res.status(404).json({ message: "Route not found" }));
+//app.use("/", ({}, res) => res.status(404).json({ message: "Route not found" }));
 
 export default app;
