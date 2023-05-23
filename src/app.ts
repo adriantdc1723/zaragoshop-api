@@ -25,6 +25,6 @@ app.get("/api", ({}, res) =>
 
 app.use("/api", ROUTES);
 
-//app.use("/", ({}, res) => res.status(404).json({ message: "Route not found" }));
+app.use("/", ({}, res) => res.status(404).json({ message: "Not found" }));
 
 export default app;
