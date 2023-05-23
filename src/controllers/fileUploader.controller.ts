@@ -7,7 +7,7 @@ import { UPLOAD_SUCCESSFUL } from "../constants/response-message";
 
 const storage = multer.diskStorage({
   destination: (req, file, callback) => {
-    callback(null, `./public/data/${req.path}`);
+    callback(null, "./public/data/uploads");
   },
   filename: (req, file, callback) => {
     const filename = "file_" + Date.now() + `.${mime.extension(file.mimetype)}`;
